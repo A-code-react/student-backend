@@ -1,0 +1,19 @@
+[
+  {
+    "name": "Ambika",
+    "dob": "2011-01-09",
+    "department": "Science",
+    "gender": "Female 👩",
+    "stateId": 1,
+    "districtId": 26,
+    "activities": ["Sports"],
+    "photo": "...",
+    "subjects": {
+      "English": 99,
+      "Physics": 99
+    },
+    "age": "15Y 2M 7D",
+    "totalMarks": 594,
+    "percentage": 99
+  }
+]
