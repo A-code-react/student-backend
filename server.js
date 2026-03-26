@@ -7,11 +7,16 @@ const helmet = require("helmet");
 const fs = require("fs");
 const path = require("path");
 const app = express();
-const uploadPath = path.join(__dirname, "uploads");
+ 
+  const uploadPath = path.join(__dirname, "uploads");
 
-if (!fs.existsSync(uploadPath)) {
-  fs.mkdirSync(uploadPath, { recursive: true });
-}
+  if (!fs.existsSync(uploadPath)) {
+    fs.mkdirSync(uploadPath, { recursive: true });
+  }
+
+  app.use("/uploads", express.static(uploadPath));
+
+ 
 // Trust proxy when deployed behind reverse proxy (Heroku, Cloud Run, etc.)
 if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", 1);
@@ -85,10 +90,9 @@ const shutdown = (signal) => {
     });
   });
 };
-
+console.log("Upload path:", uploadPath);
 process.on("SIGINT", () => shutdown("SIGINT"));
 process.on("SIGTERM", () => shutdown("SIGTERM"));
 process.on("unhandledRejection", (reason) => {
   console.error("Unhandled Rejection:", reason);
-  shutdown("unhandledRejection");
 });
