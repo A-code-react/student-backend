@@ -2,8 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Principal = require("../models/Principal");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const SECRET_KEY = "mysecretkey"; // later move to .env
+const jwt = require("jsonwebtoken"); 
 // ✅ LOGIN API
 router.post("/login", async (req, res) => {
   try {
@@ -25,7 +24,7 @@ router.post("/login", async (req, res) => {
     // create token
     const token = jwt.sign(
       { id: principal._id, email: principal.email },
-      SECRET_KEY,
+       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 

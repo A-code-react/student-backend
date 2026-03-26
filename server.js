@@ -4,9 +4,14 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const helmet = require("helmet");
-
+const fs = require("fs");
+const path = require("path");
 const app = express();
+const uploadPath = path.join(__dirname, "uploads");
 
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath, { recursive: true });
+}
 // Trust proxy when deployed behind reverse proxy (Heroku, Cloud Run, etc.)
 if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", 1);
@@ -25,7 +30,7 @@ app.use(cors({
 }));
 
 // Static folder
-app.use("/uploads", express.static("uploads"));
+app.use("/uploads", express.static(uploadPath));
 
 // Routes
 app.use("/students", require("./routes/studentRoutes"));

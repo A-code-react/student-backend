@@ -5,7 +5,7 @@ const upload = require("../middleware/upload");
 const fs = require("fs");
 const path = require("path");
 const auth = require("../middleware/auth");
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = process.env.BASE_URL || "http://localhost:5000";
 
 // ✅ GET all
 router.get("/", auth, async (req, res) => {
