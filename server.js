@@ -8,16 +8,7 @@ const fs = require("fs");
 const path = require("path");
 const app = express();
  
-  const uploadPath = path.join(__dirname, "uploads");
-
-  if (!fs.existsSync(uploadPath)) {
-    fs.mkdirSync(uploadPath, { recursive: true });
-  }
-
-  app.use("/uploads", express.static(uploadPath));
-
- 
-// Trust proxy when deployed behind reverse proxy (Heroku, Cloud Run, etc.)
+  // Trust proxy when deployed behind reverse proxy (Heroku, Cloud Run, etc.)
 if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", 1);
 }
@@ -35,8 +26,7 @@ app.use(cors({
 }));
 
 // Static folder
-app.use("/uploads", express.static(uploadPath));
-
+ 
 // Routes
 app.use("/students", require("./routes/studentRoutes"));
 app.use("/states", require("./routes/stateRoutes"));
@@ -46,7 +36,7 @@ app.use("/principals", require("./routes/principalRoutes"));
 app.get("/", (req, res) => {
   res.status(200).send("API is running...");
 });
-
+ 
 // 404
 app.use((req, res, next) => {
   res.status(404).json({ message: "Not Found" });
@@ -89,8 +79,7 @@ const shutdown = (signal) => {
       process.exit(0);
     });
   });
-};
-console.log("Upload path:", uploadPath);
+}; 
 process.on("SIGINT", () => shutdown("SIGINT"));
 process.on("SIGTERM", () => shutdown("SIGTERM"));
 process.on("unhandledRejection", (reason) => {

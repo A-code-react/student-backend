@@ -37,7 +37,10 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
+router.get("/check-uploads", (req, res) => {
+  const files = fs.readdirSync(uploadPath);
+  res.json(files);
+});
 // ✅ CREATE (WITH IMAGE UPLOAD)
 router.post("/", upload.single("photo"), async (req, res) => {
   try {
@@ -45,9 +48,7 @@ router.post("/", upload.single("photo"), async (req, res) => {
       ...req.body,
       activities: req.body.activities ? JSON.parse(req.body.activities) : [],
       subjects: req.body.subjects ? JSON.parse(req.body.subjects) : {},
-      photo: req.file 
-        ? `${BASE_URL}/uploads/${req.file.filename}`
-        : ""
+      photo: req.file ? req.file.path : ""
     };
 
     const student = new Student(studentData);
