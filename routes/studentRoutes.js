@@ -182,5 +182,5 @@ router.post("/bulk", auth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-console.log("FILE:", req.file);
+
 module.exports = router;
