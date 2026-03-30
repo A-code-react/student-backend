@@ -3,7 +3,8 @@ const router = express.Router();
 const Student = require("../models/Student");
 const upload = require("../middleware/upload");
 const cloudinary = require('cloudinary').v2;
-
+const auth = require("../middleware/auth");
+const path = require("path");
 const BASE_URL = process.env.BASE_URL || "http://localhost:5000";
 const uploadPath = path.join(__dirname, "..", "uploads");
 
@@ -22,7 +23,15 @@ router.get("/", auth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
+// ======================= CHECK UPLOADS =======================
+router.get("/check-uploads", (req, res) => {
+  try {
+    const files = fs.readdirSync(uploadPath);
+    res.json(files);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 // ======================= GET BY ID =======================
 router.get("/:id", async (req, res) => {
   try {
@@ -41,15 +50,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// ======================= CHECK UPLOADS =======================
-router.get("/check-uploads", (req, res) => {
-  try {
-    const files = fs.readdirSync(uploadPath);
-    res.json(files);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+
 
 // ======================= CREATE =======================
 router.post("/", auth, upload.single("photo"), async (req, res) => {
@@ -118,7 +119,7 @@ router.put("/:id", auth, upload.single("photo"), async (req, res) => {
       activities = req.body.activities
         ? typeof req.body.activities === "string"
           ? JSON.parse(req.body.activities)
-          : req.body.activities
+          : req.body.activities  
         : [];
 
       subjects = req.body.subjects
