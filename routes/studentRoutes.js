@@ -143,8 +143,9 @@ router.put("/:id", auth, upload.single("photo"), async (req, res) => {
       return res.status(400).json({ message: "Invalid JSON format" });
     }
 
+    const { _id, id, ...rest } = req.body;
     const updatedData = {
-      ...req.body,
+      ...rest,
       activities,
       subjects,
       photo: photoUrl,
