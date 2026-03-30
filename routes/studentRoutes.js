@@ -2,9 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Student = require("../models/Student");
 const upload = require("../middleware/upload");
-const fs = require("fs");
-const path = require("path");
-const auth = require("../middleware/auth");
+const cloudinary = require('cloudinary').v2;
 
 const BASE_URL = process.env.BASE_URL || "http://localhost:5000";
 const uploadPath = path.join(__dirname, "..", "uploads");
@@ -79,7 +77,7 @@ router.post("/", auth, upload.single("photo"), async (req, res) => {
       ...req.body,
       activities,
       subjects,
-      photo: req.file ? `${BASE_URL}/uploads/${req.file.filename}` : "",
+      photo: req.file ? req.file.path : "", // Cloudinary URL
     };
 
     const student = new Student(studentData);
@@ -95,9 +93,6 @@ router.post("/", auth, upload.single("photo"), async (req, res) => {
 // ======================= UPDATE =======================
 router.put("/:id", auth, upload.single("photo"), async (req, res) => {
   try {
-    console.log("BODY:", req.body);
-    console.log("FILE:", req.file);
-
     const existingStudent = await Student.findById(req.params.id);
 
     if (!existingStudent) {
@@ -106,21 +101,14 @@ router.put("/:id", auth, upload.single("photo"), async (req, res) => {
 
     let photoUrl = existingStudent.photo;
 
-    // Handle new image upload
+    // Handle new image upload and delete old from Cloudinary
     if (req.file) {
-      let oldImagePath = existingStudent.photo;
-
-      if (oldImagePath && oldImagePath.startsWith(BASE_URL)) {
-        oldImagePath = oldImagePath.replace(BASE_URL, "");
+      if (existingStudent.photo) {
+        // Extract public_id from Cloudinary URL (e.g., https://res.cloudinary.com/.../students/abc.jpg -> students/abc)
+        const publicId = existingStudent.photo.split('/').slice(-2).join('/').split('.')[0];
+        await cloudinary.uploader.destroy(publicId);
       }
-
-      oldImagePath = path.join(__dirname, "..", oldImagePath || "");
-
-      if (fs.existsSync(oldImagePath)) {
-        fs.unlinkSync(oldImagePath);
-      }
-
-      photoUrl = `${BASE_URL}/uploads/${req.file.filename}`;
+      photoUrl = req.file.path; // New Cloudinary URL
     }
 
     let activities = [];
@@ -139,7 +127,6 @@ router.put("/:id", auth, upload.single("photo"), async (req, res) => {
           : req.body.subjects
         : {};
     } catch (err) {
-      console.error("JSON Parse Error:", err);
       return res.status(400).json({ message: "Invalid JSON format" });
     }
 
